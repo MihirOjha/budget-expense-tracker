@@ -1,4 +1,5 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Library
 import { ToastContainer } from 'react-toastify';
@@ -63,10 +64,35 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  const [budgets, setBudgets] = useState([]);
+
+  // Fetch budgets from backend
+  useEffect(() => {
+    const fetchBudgets = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/budgets");
+        const data = await response.json();
+        setBudgets(data);
+      } catch (error) {
+        console.error("Error fetching budgets:", error);
+      }
+    };
+    
+    fetchBudgets();
+  }, []);
+
   return (
     <div className="App">
       <RouterProvider router={router} />
       <ToastContainer />
+      <div>
+        <h1>Budgets</h1>
+        <ul>
+          {budgets.map((budget) => (
+            <li key={budget._id}>{budget.name} - ${budget.amount}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
