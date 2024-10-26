@@ -8,36 +8,41 @@ export const apiFetch = async (endpoint, options = {}) => {
     const response = await fetch(
       `http://localhost:5000/api/${endpoint}`,
       options,
-    ); // Add full URL
+    );
     if (!response.ok) {
       throw new Error(`Error fetching ${endpoint}: ${response.statusText}`);
     }
 
-    const responseData = await response.json(); // Directly get response as JSON
-    console.log(`Response for ${endpoint}:`, responseData); // Log the raw response
+    const responseData = await response.json();
+    console.log(`Response for ${endpoint}:`, responseData);
 
-    return responseData; // Return parsed JSON
+    return responseData;
   } catch (error) {
     console.error('API Fetch Error:', error);
-    throw error; // Rethrow to handle it later
-  }
-};
-
-// Fetch user by username
-export const fetchUserName = async (username) => {
-  try {
-    const response = await apiFetch(`userName/${username}`);
-    return response;
-  } catch (error) {
-    console.error('Error fetching username:', error);
     throw error;
   }
 };
+
+// Fetch user by userId, with fallback if userId is invalid
+export const fetchUserName = async (userId) => {
+  if (!userId || userId === 'defaultUserId') {
+    console.warn('Invalid or missing userId, cannot fetch username.');
+    return null; // Return null if userId is invalid
+  }
+  try {
+    const response = await apiFetch(`user/${userId}`);
+    return response;
+  } catch (error) {
+    console.error('Error fetching username:', error);
+    return null; // Return null if there's an error in fetching username
+  }
+};
+
 // Fetch budgets
 export const fetchBudgets = async () => {
   try {
     const response = await apiFetch('budgets');
-    console.log('Fetched budgets:', response); // Log the fetched budgets
+    console.log('Fetched budgets:', response);
     if (!Array.isArray(response))
       throw new Error('Invalid data format for budgets');
     return response;
@@ -62,31 +67,49 @@ export const fetchExpenses = async () => {
 
 // Create budget with API call
 export const createBudget = async ({ name, amount }) => {
-  return await apiFetch('budgets', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name, amount }),
-  });
+  try {
+    const response = await apiFetch('budgets', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, amount }),
+    });
+    return response;
+  } catch (error) {
+    console.error('Error creating budget:', error);
+    throw error;
+  }
 };
 
 // Create expense with API call
 export const createExpense = async ({ name, amount, budgetId }) => {
-  return await apiFetch('expenses', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name, amount, budgetId }),
-  });
+  try {
+    const response = await apiFetch('expenses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, amount, budgetId }),
+    });
+    return response;
+  } catch (error) {
+    console.error('Error creating expense:', error);
+    throw error;
+  }
 };
 
 // Delete item from MongoDB
 export const deleteItem = async ({ key, id }) => {
-  return await apiFetch(`${key}/${id}`, {
-    method: 'DELETE',
-  });
+  try {
+    const response = await apiFetch(`${key}/${id}`, {
+      method: 'DELETE',
+    });
+    return response;
+  } catch (error) {
+    console.error(`Error deleting item with id ${id} from ${key}:`, error);
+    throw error;
+  }
 };
 
 // Calculate total spent by budget
@@ -98,7 +121,7 @@ export const calculateSpentByBudget = async (budgetId) => {
     }, 0);
   } catch (error) {
     console.error('Error calculating spent by budget:', error);
-    throw error; // Handle errors in calculation
+    throw error;
   }
 };
 

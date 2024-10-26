@@ -22,11 +22,12 @@ import {
 // Fetch initial dashboard data
 export async function dashboardLoader() {
   try {
-    const userName = await fetchUserName();
+    const userId = localStorage.getItem('userId');
+    const userName = userId ? await fetchUserName(userId) : null;
     const budgets = await fetchBudgets();
     const expenses = await fetchExpenses();
 
-    console.log('Fetched data:', { userName, budgets, expenses }); // Log data
+    console.log('Fetched data:', { userName, budgets, expenses });
     return { userName, budgets, expenses };
   } catch (error) {
     console.error('Error fetching data:', error);
