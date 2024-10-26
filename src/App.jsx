@@ -6,40 +6,46 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Layouts
-import Main, { mainLoader } from './layouts/Main';
+import Main from './layouts/Main';
 
 // Actions
 import { logoutAction } from './actions/logout';
 import { deleteBudget } from './actions/deleteBudget';
 
-// Routes
-import Dashboard, { dashboardAction, dashboardLoader } from './pages/Dashboard';
+// Routes and Loaders
+import Dashboard, { dashboardLoader } from './pages/Dashboard';
 import Error from './pages/Error';
-import BudgetPage, { budgetAction, budgetLoader } from './pages/BudgetPage';
-import ExpensesPage, {
-  expensesAction,
-  expensesLoader,
-} from './pages/ExpensesPage';
+import BudgetPage, { budgetLoader } from './pages/BudgetPage';
+import ExpensesPage, { expensesLoader } from './pages/ExpensesPage';
+
+// Import fetch function
+import { fetchBudgets } from './helpers';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Main />,
-    loader: mainLoader,
+    loader: async () => {
+      try {
+        const budgets = await fetchBudgets(); // Using fetchBudgets helper
+        return { budgets };
+      } catch (error) {
+        console.error("Error loading budgets:", error);
+        throw error; // This will trigger the errorElement
+      }
+    },
     errorElement: <Error />,
     children: [
       {
         index: true,
         element: <Dashboard />,
         loader: dashboardLoader,
-        action: dashboardAction,
         errorElement: <Error />,
       },
       {
         path: 'budget/:id',
         element: <BudgetPage />,
         loader: budgetLoader,
-        action: budgetAction,
         errorElement: <Error />,
         children: [
           {
@@ -52,7 +58,6 @@ const router = createBrowserRouter([
         path: 'expenses',
         element: <ExpensesPage />,
         loader: expensesLoader,
-        action: expensesAction,
         errorElement: <Error />,
       },
       {
@@ -65,20 +70,33 @@ const router = createBrowserRouter([
 
 function App() {
   const [budgets, setBudgets] = useState([]);
+  const [error, setError] = useState(null); // State for error handling
 
   // Fetch budgets from backend
   useEffect(() => {
-    const fetchBudgets = async () => {
+    const controller = new AbortController(); // Abort controller for cleanup
+    const fetchBudgetsData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/budgets");
-        const data = await response.json();
-        setBudgets(data);
+        const data = await fetchBudgets(); // Using fetchBudgets helper
+        if (Array.isArray(data)) {
+          setBudgets(data);
+        } else {
+          console.error("Fetched data is not an array:", data);
+          setError("Failed to fetch budgets.");
+        }
       } catch (error) {
-        console.error("Error fetching budgets:", error);
+        if (error.name !== 'AbortError') {
+          console.error("Error fetching budgets:", error);
+          setError("Error fetching budgets.");
+        }
       }
     };
-    
-    fetchBudgets();
+
+    fetchBudgetsData();
+
+    return () => {
+      controller.abort(); // Clean up the fetch on component unmount
+    };
   }, []);
 
   return (
@@ -87,11 +105,19 @@ function App() {
       <ToastContainer />
       <div>
         <h1>Budgets</h1>
-        <ul>
-          {budgets.map((budget) => (
-            <li key={budget._id}>{budget.name} - ${budget.amount}</li>
-          ))}
-        </ul>
+        {error ? (
+          <div className="error">{error}</div> // Display error message
+        ) : (
+          <ul>
+            {budgets.length > 0 ? (
+              budgets.map((budget) => (
+                <li key={budget._id}>{budget.name} - ${budget.amount}</li>
+              ))
+            ) : (
+              <li>No budgets available.</li>
+            )}
+          </ul>
+        )}
       </div>
     </div>
   );

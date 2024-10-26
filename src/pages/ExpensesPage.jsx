@@ -1,18 +1,18 @@
 // rrd imports
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData } from 'react-router-dom';
 
 // library import
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 
 // component imports
-import Table from "../components/Table";
+import Table from '../components/Table';
 
 // helpers
-import { deleteItem, fetchData } from "../helpers";
+import { deleteItem, fetchExpenses } from '../helpers';
 
 // loader
 export async function expensesLoader() {
-  const expenses = fetchData("expenses");
+  const expenses = await fetchExpenses(); // Await the fetchExpenses function
   return { expenses };
 }
 
@@ -21,15 +21,17 @@ export async function expensesAction({ request }) {
   const data = await request.formData();
   const { _action, ...values } = Object.fromEntries(data);
 
-  if (_action === "deleteExpense") {
+  if (_action === 'deleteExpense') {
     try {
-      deleteItem({
-        key: "expenses",
+      await deleteItem({
+        // Await the deleteItem function
+        key: 'expenses',
         id: values.expenseId,
       });
-      return toast.success("Expense deleted!");
+      toast.success('Expense deleted!'); // Move toast success outside of the return statement
     } catch (e) {
-      throw new Error("There was a problem deleting your expense.");
+      toast.error('There was a problem deleting your expense.'); // Show error toast
+      throw new Error('There was a problem deleting your expense.');
     }
   }
 }

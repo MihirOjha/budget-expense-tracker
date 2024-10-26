@@ -1,141 +1,135 @@
-// rrd imports
 import { Link, useLoaderData } from 'react-router-dom';
-
-// library imports
 import { toast } from 'react-toastify';
 
-// components
+// Components
 import Intro from '../components/Intro';
 import AddBudgetForm from '../components/AddBudgetForm';
 import AddExpenseForm from '../components/AddExpenseForm';
-import AddIncomeForm from '../components/AddIncomeForm';
 import BudgetItem from '../components/BudgetItem';
 import Table from '../components/Table';
 
-//  helper functions
+// Helpers
 import {
+  fetchUserName,
+  fetchBudgets,
+  fetchExpenses,
   createBudget,
   createExpense,
   deleteItem,
-  fetchData,
   waait,
 } from '../helpers';
 
-// loader
-export function dashboardLoader() {
-  const userName = fetchData('userName');
-  const budgets = fetchData('budgets');
-  const expenses = fetchData('expenses');
-  return { userName, budgets, expenses };
+// Fetch initial dashboard data
+export async function dashboardLoader() {
+  try {
+    const userName = await fetchUserName();
+    const budgets = await fetchBudgets();
+    const expenses = await fetchExpenses();
+
+    console.log('Fetched data:', { userName, budgets, expenses }); // Log data
+    return { userName, budgets, expenses };
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw new Response('Error loading dashboard data', { status: 500 });
+  }
 }
 
-// action
+// Action to handle budget and expense form submissions
 export async function dashboardAction({ request }) {
   await waait();
-
   const data = await request.formData();
   const { _action, ...values } = Object.fromEntries(data);
 
-  // new user submission
-  if (_action === 'newUser') {
-    try {
-      localStorage.setItem('userName', JSON.stringify(values.userName));
-      return toast.success(`Welcome, ${values.userName}`);
-    } catch (e) {
-      throw new Error('There was a problem creating your account.');
-    }
-  }
-
-  if (_action === 'createBudget') {
-    try {
-      createBudget({
-        name: values.newBudget,
-        amount: values.newBudgetAmount,
+  try {
+    // New user submission
+    if (_action === 'newUser') {
+      await apiFetch('user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: values.userName }),
       });
-      return toast.success('Budget created!');
-    } catch (e) {
-      throw new Error('There was a problem creating your budget.');
+      toast.success(`Welcome, ${values.userName}`);
     }
-  }
 
-  if (_action === 'createExpense') {
-    try {
-      createExpense({
+    // Create budget
+    if (_action === 'createBudget') {
+      await createBudget({ name: values.name, amount: values.amount });
+      toast.success('Budget created!');
+    }
+
+    // Create expense
+    if (_action === 'createExpense') {
+      await createExpense({
         name: values.newExpense,
-        amount: values.newExpenseAmount,
-        budgetId: values.newExpenseBudget,
+        amount: values.amount,
+        budgetId: values.budgetId,
       });
-      return toast.success(`Expense ${values.newExpense} created!`);
-    } catch (e) {
-      throw new Error('There was a problem creating your expense.');
+      toast.success(`Expense ${values.newExpense} created!`);
     }
-  }
 
-  if (_action === 'deleteExpense') {
-    try {
-      deleteItem({
-        key: 'expenses',
-        id: values.expenseId,
-      });
-      return toast.success('Expense deleted!');
-    } catch (e) {
-      throw new Error('There was a problem deleting your expense.');
+    // Delete expense
+    if (_action === 'deleteExpense') {
+      await deleteItem({ key: 'expenses', id: values.expenseId });
+      toast.success('Expense deleted!');
     }
+  } catch (error) {
+    console.error('Action error:', error);
+    throw new Error('There was a problem processing your request.');
   }
 }
 
 const Dashboard = () => {
   const { userName, budgets, expenses } = useLoaderData();
 
+  if (!userName) {
+    return <Intro />;
+  }
+
   return (
-    <>
-      {userName ? (
-        <div className="dashboard">
-          <h1>
-            Welcome back, <span className="accent">{userName}</span>
-          </h1>
-          <div className="grid-sm">
-            {budgets && budgets.length > 0 ? (
-              <div className="grid-lg">
-                <div className="flex-lg">
-                  <AddBudgetForm />
-                  <AddExpenseForm budgets={budgets} />
-                </div>
-                <h2>Existing Budgets</h2>
-                <div className="budgets">
-                  {budgets.map((budget) => (
-                    <BudgetItem key={budget.id} budget={budget} />
-                  ))}
-                </div>
-                {expenses && expenses.length > 0 && (
-                  <div className="grid-md">
-                    <h2>Recent Expenses</h2>
-                    <Table
-                      expenses={expenses
-                        .sort((a, b) => b.createdAt - a.createdAt)
-                        .slice(0, 8)}
-                    />
-                    {expenses.length > 8 && (
-                      <Link to="expenses" className="btn btn--dark">
-                        View all expenses
-                      </Link>
-                    )}
-                  </div>
+    <div className="dashboard">
+      <h1>
+        Welcome back, <span className="accent">{userName}</span>
+      </h1>
+      <div className="grid-sm">
+        {budgets && budgets.length > 0 ? (
+          <div className="grid-lg">
+            <div className="flex-lg">
+              <AddBudgetForm />
+              <AddExpenseForm budgets={budgets} />
+            </div>
+            <h2>Existing Budgets</h2>
+            <div className="budgets">
+              {budgets.map((budget) => (
+                <BudgetItem key={budget._id} budget={budget} />
+              ))}
+            </div>
+            {expenses && expenses.length > 0 && (
+              <div className="grid-md">
+                <h2>Recent Expenses</h2>
+                <Table
+                  expenses={expenses
+                    .sort(
+                      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+                    )
+                    .slice(0, 8)}
+                />
+                {expenses.length > 8 && (
+                  <Link to="expenses" className="btn btn--dark">
+                    View all expenses
+                  </Link>
                 )}
-              </div>
-            ) : (
-              <div className="grid-sm">
-                <p>Mishni's Attempt to Budget</p>
-                <p>Create a budget to get started!</p>
-                <AddBudgetForm />
               </div>
             )}
           </div>
-        </div>
-      ) : (
-        <Intro />
-      )}
-    </>
+        ) : (
+          <div className="grid-sm">
+            <p>Create a budget to get started!</p>
+            <AddBudgetForm />
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
+
 export default Dashboard;

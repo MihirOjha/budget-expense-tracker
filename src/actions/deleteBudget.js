@@ -1,35 +1,42 @@
 // rrd import
-import { redirect } from "react-router-dom";
+import { redirect } from 'react-router-dom';
 
 // library
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 
 // helpers
-import { deleteItem, getAllMatchingItems } from "../helpers";
+import { deleteItem, fetchExpenses } from '../helpers';
 
-export function deleteBudget({ params }) {
+export async function deleteBudget({ params }) {
   try {
-    deleteItem({
-      key: "budgets",
+    // Delete the budget
+    await deleteItem({
+      key: 'budgets',
       id: params.id,
     });
 
-    const associatedExpenses = getAllMatchingItems({
-      category: "expenses",
-      key: "budgetId",
-      value: params.id,
-    });
+    // Fetch associated expenses
+    const associatedExpenses = await fetchExpenses(); // Fetching all expenses
 
-    associatedExpenses.forEach((expense) => {
-      deleteItem({
-        key: "expenses",
-        id: expense.id,
-      });
-    });
+    // Filter expenses that are associated with the budget being deleted
+    const expensesToDelete = associatedExpenses.filter(
+      (expense) => expense.budgetId === params.id,
+    );
 
-    toast.success("Budget deleted successfully!");
+    // Delete associated expenses
+    await Promise.all(
+      expensesToDelete.map((expense) =>
+        deleteItem({
+          key: 'expenses',
+          id: expense.id,
+        }),
+      ),
+    );
+
+    toast.success('Budget deleted successfully!');
   } catch (e) {
-    throw new Error("There was a problem deleting your budget.");
+    toast.error('There was a problem deleting your budget.'); // Change to toast on error
+    console.error(e); // Log error for debugging
   }
-  return redirect("/");
+  return redirect('/');
 }
