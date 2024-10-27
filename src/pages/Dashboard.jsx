@@ -12,7 +12,7 @@ const Dashboard = () => {
 
   const fetchBudgets = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/budgets');
+      const response = await axios.get('https://budget-expense-tracker-backend.onrender.com/api/budgets');
       setBudgets(response.data);
     } catch (error) {
       toast.error('Error fetching budgets');
@@ -21,7 +21,7 @@ const Dashboard = () => {
 
   const fetchExpenses = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/expenses');
+      const response = await axios.get('https://budget-expense-tracker-backend.onrender.com/api/expenses');
       setExpenses(response.data);
     } catch (error) {
       toast.error('Error fetching expenses');

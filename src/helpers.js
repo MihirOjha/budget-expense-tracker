@@ -6,7 +6,7 @@ export const waait = () =>
 export const apiFetch = async (endpoint, options = {}) => {
   try {
     const response = await fetch(
-      `http://localhost:5000/api/${endpoint}`,
+      `https://budget-expense-tracker-backend.onrender.com/api/${endpoint}`,
       options,
     );
     if (!response.ok) {

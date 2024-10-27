@@ -11,7 +11,7 @@ const AddBudgetForm = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/api/budgets', {
+      const response = await axios.post('https://budget-expense-tracker-backend.onrender.com/api/budgets', {
         name,
         amount,
       });
