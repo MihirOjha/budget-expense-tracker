@@ -1,9 +1,5 @@
 import { Form } from 'react-router-dom';
-
-// library
 import { UserPlusIcon } from '@heroicons/react/24/solid';
-
-// assets
 import illustration from '../assets/illustration.jpg';
 
 const Intro = () => {
@@ -35,4 +31,5 @@ const Intro = () => {
     </div>
   );
 };
-export default Intro;
+
+export default Intro; // Ensure this line is present

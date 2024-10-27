@@ -40,16 +40,17 @@ export const fetchUserName = async (userId) => {
 
 // Fetch budgets
 export const fetchBudgets = async () => {
-  try {
-    const response = await apiFetch('budgets');
-    console.log('Fetched budgets:', response);
-    if (!Array.isArray(response))
-      throw new Error('Invalid data format for budgets');
-    return response;
-  } catch (error) {
-    console.error('Failed to fetch budgets:', error);
-    throw error;
+  const response = await fetch('/api/budgets');
+
+  if (!response.ok) {
+      const errorText = await response.text(); // Get the response text for debugging
+      console.error('Error fetching budgets:', errorText);
+      throw new Error(`Failed to fetch budgets: ${response.status} ${response.statusText}`);
   }
+
+  const data = await response.json();
+  console.log('Fetched budgets:', data); // Log fetched budgets
+  return data;
 };
 
 // Fetch expenses

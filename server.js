@@ -1,4 +1,3 @@
-// server.js
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -33,10 +32,9 @@ mongoose
 // User Schema
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  // Include other fields as necessary
 });
 
-// Define Budget and Expense Schemas here
+// Define Budget and Expense Schemas
 const budgetSchema = new mongoose.Schema({
   name: { type: String, required: true },
   amount: { type: Number, required: true },
@@ -71,150 +69,49 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Add a new user
-app.post(
-  '/api/users',
-  [body('username').isString().notEmpty()],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-      const { username } = req.body;
-      const user = new User({ username });
-      await user.save();
-      res.status(201).json(user);
-    } catch (error) {
-      if (error.code === 11000) {
-        return res.status(400).json({ message: 'Username already exists.' });
-      }
-      handleError(res, error);
-    }
-  },
-);
-
-// Fetch user by specific username
-app.get('/api/users/:username', async (req, res) => {
-  try {
-    const user = await User.findOne({ username: req.params.username });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    res.json({ username: user.username });
-  } catch (error) {
-    handleError(res, error);
-  }
-});
-
-// Fetch the first available user (generic endpoint)
-app.get('/api/username', async (req, res) => {
-  try {
-    const user = await User.findOne();
-    if (!user) {
-      return res.status(404).json({ message: 'No users found' });
-    }
-    res.json({ username: user.username });
-  } catch (error) {
-    handleError(res, error);
-  }
-});
-
 // Add a new budget
-app.post(
-  '/api/budgets',
-  [
-    body('name').isString().notEmpty(),
-    body('amount').isNumeric().not().isEmpty(),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+app.post('/api/budgets', async (req, res) => {
+  const { name, amount } = req.body;
 
-    try {
-      const { name, amount } = req.body;
-      const budget = new Budget({ name, amount });
-      await budget.save();
-      res.status(201).json(budget);
-    } catch (error) {
-      handleError(res, error);
-    }
-  },
-);
+  try {
+    const budget = new Budget({ name, amount });
+    await budget.save();
+    res.status(201).json({ message: 'Budget created successfully', budget });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
 
 // Fetch budgets
 app.get('/api/budgets', async (req, res) => {
   try {
     const budgets = await Budget.find();
-    res.json(budgets); // Make sure this is returning a valid JSON object
+    res.json(budgets);
   } catch (error) {
-    console.error('Error fetching budgets:', error); // Check for errors in server logs
-    res.status(500).json({ message: 'Server error: ' + error.message });
+    handleError(res, error);
   }
 });
 
 // Update budget by ID
-app.put(
-  '/api/budgets/:id',
-  [
-    body('name').isString().notEmpty(),
-    body('amount').isNumeric().not().isEmpty(),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+app.put('/api/budgets/:id', [
+  body('name').isString().notEmpty(),
+  body('amount').isNumeric().not().isEmpty(),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-    try {
-      const updatedBudget = await Budget.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true },
-      );
-      if (!updatedBudget) {
-        return res.status(404).json({ message: 'Budget not found' });
-      }
-      res.json(updatedBudget);
-    } catch (error) {
-      handleError(res, error);
-    }
-  },
-);
-
-// Add a new expense
-app.post(
-  '/api/expenses',
-  [
-    body('name').isString().notEmpty(),
-    body('amount').isNumeric().not().isEmpty(),
-    body('budgetId').isMongoId().notEmpty(),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-      const { name, amount, budgetId } = req.body;
-      const expense = new Expense({ name, amount, budgetId });
-      await expense.save();
-      res.status(201).json(expense);
-    } catch (error) {
-      handleError(res, error);
-    }
-  },
-);
-
-// Fetch all expenses
-app.get('/api/expenses', async (req, res) => {
   try {
-    const expenses = await Expense.find().populate('budgetId', 'name amount');
-    res.json(expenses);
+    const updatedBudget = await Budget.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true },
+    );
+    if (!updatedBudget) {
+      return res.status(404).json({ message: 'Budget not found' });
+    }
+    res.json(updatedBudget);
   } catch (error) {
     handleError(res, error);
   }
@@ -228,6 +125,55 @@ app.delete('/api/budgets/:id', async (req, res) => {
       return res.status(404).json({ message: 'Budget not found' });
     }
     res.status(204).send();
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+// Add a new expense
+app.post('/api/expenses', async (req, res) => {
+  const { name, amount, budgetId } = req.body;
+
+  try {
+    const expense = new Expense({ name, amount, budgetId });
+    await expense.save();
+    res.status(201).json({ message: 'Expense created successfully', expense });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+// Fetch all expenses
+app.get('/api/expenses', async (req, res) => {
+  try {
+    const expenses = await Expense.find().populate('budgetId', 'name amount');
+    res.json(expenses);
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+// Update expense by ID
+app.put('/api/expenses/:id', [
+  body('name').isString().notEmpty(),
+  body('amount').isNumeric().not().isEmpty(),
+  body('budgetId').isMongoId().notEmpty(),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const updatedExpense = await Expense.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true },
+    );
+    if (!updatedExpense) {
+      return res.status(404).json({ message: 'Expense not found' });
+    }
+    res.json(updatedExpense);
   } catch (error) {
     handleError(res, error);
   }
