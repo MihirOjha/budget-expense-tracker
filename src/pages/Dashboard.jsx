@@ -71,7 +71,9 @@ const Dashboard = () => {
               <BudgetItem
                 key={budget._id}
                 budget={budget}
-                expenses={expenses}
+                expenses={expenses.filter(
+                  (expense) => expense.budgetId === budget._id,
+                )}
               />
             ))}
           </div>
