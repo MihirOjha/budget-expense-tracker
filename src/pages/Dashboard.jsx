@@ -49,14 +49,18 @@ const Dashboard = () => {
     setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
   };
 
+  const handleBudgetCreated = (newBudget) => {
+    setBudgets((prevBudgets) => [...prevBudgets, newBudget]);
+  };
+
   return (
     <div className="dashboard">
       <h1>
-        Welcome back, <span className="accent">Peeks</span>
+        Welcome back, <span className="accent">User</span>
       </h1>
       <div className="grid-lg">
         <div className="flex-lg">
-          <AddBudgetForm />
+          <AddBudgetForm onBudgetCreated={handleBudgetCreated} />
           <AddExpenseForm
             budgets={budgets}
             onExpenseCreated={handleExpenseCreated}
@@ -71,9 +75,7 @@ const Dashboard = () => {
               <BudgetItem
                 key={budget._id}
                 budget={budget}
-                expenses={expenses.filter(
-                  (expense) => expense.budgetId === budget._id,
-                )}
+                expenses={expenses}
               />
             ))}
           </div>

@@ -27,6 +27,8 @@ app.use(
   }),
 );
 
+app.use(express.json());
+
 // MongoDB Connection
 if (!process.env.MONGODB_URI) {
   console.error('MONGODB_URI is not defined in .env file');

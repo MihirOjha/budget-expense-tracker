@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+// src/components/BudgetItem.jsx
+import React, { useEffect, useState } from 'react';
 import { Form, Link } from 'react-router-dom';
 import { BanknotesIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { formatCurrency } from '../helpers'; // Removed calculateSpentByBudget import since it's no longer needed
+import { formatCurrency } from '../helpers';
 
 const BudgetItem = ({ budget, expenses, showDelete = false }) => {
   const { _id, name = 'Unnamed Budget', amount = 0, color = '#000' } = budget;
@@ -9,11 +10,11 @@ const BudgetItem = ({ budget, expenses, showDelete = false }) => {
 
   useEffect(() => {
     const totalSpent = expenses
-      .filter((expense) => expense.budgetId === _id)
+      .filter((expense) => expense.budgetId && expense.budgetId._id === _id)
       .reduce((total, expense) => total + expense.amount, 0);
 
     setSpent(totalSpent);
-  }, [expenses, _id]); // Recalculate spent whenever expenses or budgetId change
+  }, [expenses, _id]);
 
   return (
     <div className="budget" style={{ '--accent': color }}>

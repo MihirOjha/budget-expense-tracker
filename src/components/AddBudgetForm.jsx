@@ -26,12 +26,22 @@ const AddBudgetForm = ({ onBudgetCreated }) => {
 
     try {
       const response = await axios.post(apiUrl, { name, amount });
+
+      // Budget created successfully
       toast.success('Budget created successfully!');
       setName('');
       setAmount('');
-      onBudgetCreated(response.data); // Notify parent component
+
+      // Call the callback function with the created budget
+      if (onBudgetCreated) {
+        onBudgetCreated(response.data.budget); // Assuming your response contains the budget data
+      }
     } catch (error) {
-      toast.error('Failed to create budget: ' + error.response.data.message);
+      if (error.response) {
+        toast.error('Failed to create budget: ' + error.response.data.message);
+      } else {
+        toast.error('Failed to create budget: ' + error.message);
+      }
     } finally {
       setIsSubmitting(false);
     }
