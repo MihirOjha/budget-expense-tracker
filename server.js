@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://mishni-budget-expense-tracker.netlify.app',
+  'https://budget-expense-tracker-backend.onrender.com',
 ];
 
 app.use(
