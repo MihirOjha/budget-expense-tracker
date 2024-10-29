@@ -1,34 +1,28 @@
-// rrd imports
+// src/components/BudgetItem.jsx
+import React, { useEffect, useState } from 'react';
 import { Form, Link } from 'react-router-dom';
-
-// library imports
 import { BanknotesIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { formatCurrency } from '../helpers';
 
-// helper functions
-import {
-  calculateSpentByBudget,
-  formatCurrency,
-  formatPercentage,
-} from '../helpers';
+const BudgetItem = ({ budget, expenses, showDelete = false }) => {
+  const { _id, name = 'Unnamed Budget', amount = 0, color = '#000' } = budget;
+  const [spent, setSpent] = useState(0);
 
-const BudgetItem = ({ budget, showDelete = false }) => {
-  const { _id, name = 'Unnamed Budget', amount = 0, color = '#000' } = budget; // Default values
-  const spent = calculateSpentByBudget(_id);
+  useEffect(() => {
+    const totalSpent = expenses
+      .filter((expense) => expense.budgetId && expense.budgetId._id === _id)
+      .reduce((total, expense) => total + expense.amount, 0);
+
+    setSpent(totalSpent);
+  }, [expenses, _id]);
 
   return (
-    <div
-      className="budget"
-      style={{
-        '--accent': color,
-      }}
-    >
+    <div className="budget" style={{ '--accent': color }}>
       <div className="progress-text">
         <h3>{name}</h3>
         <p>{formatCurrency(amount)} Budgeted</p>
       </div>
-      <progress max={amount} value={spent}>
-        {formatPercentage(spent / amount)}
-      </progress>
+      <progress max={amount} value={spent} />
       <div className="progress-text">
         <small>{formatCurrency(spent)} spent</small>
         <small>{formatCurrency(amount - spent)} remaining</small>

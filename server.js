@@ -9,7 +9,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+// Middleware
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Allow requests from your React app
+  }),
+);
 app.use(express.json()); // For parsing JSON requests
 
 // MongoDB Connection
@@ -93,29 +98,33 @@ app.get('/api/budgets', async (req, res) => {
 });
 
 // Update budget by ID
-app.put('/api/budgets/:id', [
-  body('name').isString().notEmpty(),
-  body('amount').isNumeric().not().isEmpty(),
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
-    const updatedBudget = await Budget.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true },
-    );
-    if (!updatedBudget) {
-      return res.status(404).json({ message: 'Budget not found' });
+app.put(
+  '/api/budgets/:id',
+  [
+    body('name').isString().notEmpty(),
+    body('amount').isNumeric().not().isEmpty(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    res.json(updatedBudget);
-  } catch (error) {
-    handleError(res, error);
-  }
-});
+
+    try {
+      const updatedBudget = await Budget.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true },
+      );
+      if (!updatedBudget) {
+        return res.status(404).json({ message: 'Budget not found' });
+      }
+      res.json(updatedBudget);
+    } catch (error) {
+      handleError(res, error);
+    }
+  },
+);
 
 // Delete budget by ID
 app.delete('/api/budgets/:id', async (req, res) => {
@@ -135,6 +144,12 @@ app.post('/api/expenses', async (req, res) => {
   const { name, amount, budgetId } = req.body;
 
   try {
+    // Check if the budget exists
+    const budgetExists = await Budget.findById(budgetId);
+    if (!budgetExists) {
+      return res.status(404).json({ message: 'Budget not found' });
+    }
+
     const expense = new Expense({ name, amount, budgetId });
     await expense.save();
     res.status(201).json({ message: 'Expense created successfully', expense });
@@ -154,30 +169,34 @@ app.get('/api/expenses', async (req, res) => {
 });
 
 // Update expense by ID
-app.put('/api/expenses/:id', [
-  body('name').isString().notEmpty(),
-  body('amount').isNumeric().not().isEmpty(),
-  body('budgetId').isMongoId().notEmpty(),
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
-    const updatedExpense = await Expense.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true },
-    );
-    if (!updatedExpense) {
-      return res.status(404).json({ message: 'Expense not found' });
+app.put(
+  '/api/expenses/:id',
+  [
+    body('name').isString().notEmpty(),
+    body('amount').isNumeric().not().isEmpty(),
+    body('budgetId').isMongoId().notEmpty(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    res.json(updatedExpense);
-  } catch (error) {
-    handleError(res, error);
-  }
-});
+
+    try {
+      const updatedExpense = await Expense.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true },
+      );
+      if (!updatedExpense) {
+        return res.status(404).json({ message: 'Expense not found' });
+      }
+      res.json(updatedExpense);
+    } catch (error) {
+      handleError(res, error);
+    }
+  },
+);
 
 // Delete expense by ID
 app.delete('/api/expenses/:id', async (req, res) => {

@@ -1,14 +1,15 @@
+import axios from 'axios';
+
 // Wait helper function
 export const waait = () =>
   new Promise((res) => setTimeout(res, Math.random() * 800));
 
 // General API fetch function with error handling
 export const apiFetch = async (endpoint, options = {}) => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
   try {
-    const response = await fetch(
-      `https://budget-expense-tracker-backend.onrender.com/api/${endpoint}`,
-      options,
-    );
+    const response = await fetch(`${baseUrl}/${endpoint}`, options);
     if (!response.ok) {
       throw new Error(`Error fetching ${endpoint}: ${response.statusText}`);
     }
@@ -26,8 +27,7 @@ export const apiFetch = async (endpoint, options = {}) => {
 // Fetch user by userId, with fallback if userId is invalid
 export const fetchUserName = async (userId) => {
   if (!userId || userId === 'defaultUserId') {
-    console.warn('Invalid or missing userId, cannot fetch username.');
-    return null; // Return null if userId is invalid
+    throw new Error('Invalid or missing userId'); // Throw error for better handling
   }
   try {
     const response = await apiFetch(`user/${userId}`);
@@ -40,28 +40,19 @@ export const fetchUserName = async (userId) => {
 
 // Fetch budgets
 export const fetchBudgets = async () => {
-  const response = await fetch('/api/budgets');
-
-  if (!response.ok) {
-      const errorText = await response.text(); // Get the response text for debugging
-      console.error('Error fetching budgets:', errorText);
-      throw new Error(`Failed to fetch budgets: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  console.log('Fetched budgets:', data); // Log fetched budgets
-  return data;
+  return await apiFetch('budgets'); // Use apiFetch for consistency
 };
 
 // Fetch expenses
 export const fetchExpenses = async () => {
   try {
-    const response = await apiFetch('expenses');
-    if (!Array.isArray(response))
-      throw new Error('Invalid data format for expenses');
-    return response;
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/expenses`,
+    );
+    console.log('Fetched expenses:', response.data); // Debugging log
+    return response.data;
   } catch (error) {
-    console.error('Failed to fetch expenses:', error);
+    console.error('Error fetching expenses:', error);
     throw error;
   }
 };
@@ -106,6 +97,9 @@ export const deleteItem = async ({ key, id }) => {
     const response = await apiFetch(`${key}/${id}`, {
       method: 'DELETE',
     });
+    if (!response) {
+      throw new Error(`Failed to delete item with id ${id}`);
+    }
     return response;
   } catch (error) {
     console.error(`Error deleting item with id ${id} from ${key}:`, error);
@@ -116,13 +110,17 @@ export const deleteItem = async ({ key, id }) => {
 // Calculate total spent by budget
 export const calculateSpentByBudget = async (budgetId) => {
   try {
-    const expenses = await fetchExpenses();
-    return expenses.reduce((acc, expense) => {
-      return expense.budgetId === budgetId ? acc + expense.amount : acc;
-    }, 0);
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/expenses`,
+    );
+    const expenses = response.data.filter(
+      (expense) => expense.budgetId.toString() === budgetId.toString(),
+    );
+    console.log(`Expenses for budget ${budgetId}:`, expenses);
+    return expenses.reduce((total, expense) => total + expense.amount, 0);
   } catch (error) {
-    console.error('Error calculating spent by budget:', error);
-    throw error;
+    console.error('Error calculating spent amount:', error);
+    return 0;
   }
 };
 
