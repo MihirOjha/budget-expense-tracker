@@ -56,7 +56,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <h1>
-        Welcome back, <span className="accent">User</span>
+        Welcome back, <span className="accent">Peeks</span>
       </h1>
       <div className="grid-lg">
         <div className="flex-lg">
