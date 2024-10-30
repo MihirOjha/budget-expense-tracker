@@ -17,7 +17,8 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -183,6 +184,21 @@ app.get('/api/expenses', async (req, res) => {
   }
 });
 
+// Fetch expenese by id
+app.get('/api/expenses/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const expense = await Expense.findById(id); // Assuming you are using Mongoose
+    if (!expense) {
+      return res.status(404).json({ message: 'Expense not found' });
+    }
+    res.status(200).json(expense);
+  } catch (error) {
+    console.error('Error fetching expense:', error);
+    res.status(500).json({ message: 'Failed to fetch expense' });
+  }
+});
+
 // Update expense by ID
 app.put(
   '/api/expenses/:id',
@@ -215,14 +231,21 @@ app.put(
 
 // Delete expense by ID
 app.delete('/api/expenses/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    const deletedExpense = await Expense.findByIdAndDelete(req.params.id);
+    const deletedExpense = await Expense.findByIdAndDelete(id); // Assuming you are using Mongoose
     if (!deletedExpense) {
       return res.status(404).json({ message: 'Expense not found' });
     }
-    res.status(204).send();
+    res
+      .status(200)
+      .json({
+        message: 'Expense deleted successfully',
+        expense: deletedExpense,
+      });
   } catch (error) {
-    handleError(res, error);
+    console.error('Error deleting expense:', error);
+    res.status(500).json({ message: 'Failed to delete expense' });
   }
 });
 

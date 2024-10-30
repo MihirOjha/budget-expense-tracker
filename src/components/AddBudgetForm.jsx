@@ -1,4 +1,3 @@
-// src/components/AddBudgetForm.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -74,10 +73,16 @@ const AddBudgetForm = ({ onBudgetCreated }) => {
             required
           />
         </div>
-        <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
-          {isSubmitting ? 'Submitting...' : 'Add Budget'}
-          <CurrencyDollarIcon width={20} />
-        </button>
+        <div className="button-container">
+          <button
+            type="submit"
+            className="btn btn--dark"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : 'Add Budget'}
+            <CurrencyDollarIcon width={20} />
+          </button>
+        </div>
       </form>
     </div>
   );

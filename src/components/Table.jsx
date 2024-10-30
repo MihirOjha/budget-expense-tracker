@@ -1,23 +1,26 @@
-// component import
-import ExpenseItem from "./ExpenseItem";
+import ExpenseItem from './ExpenseItem';
 
-const Table = ({ expenses, showBudget = true }) => {
+const Table = ({ expenses, showBudget = true, onDelete }) => {
   return (
     <div className="table">
       <table>
         <thead>
           <tr>
-            {["Name", "Amount", "Date", showBudget ? "Budget" : "", ""].map(
-              (i, index) => (
-                <th key={index}>{i}</th>
-              )
-            )}
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Date</th>
+            {showBudget && <th>Budget</th>}
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {expenses.map((expense) => (
-            <tr key={expense.id}>
-              <ExpenseItem expense={expense} showBudget={showBudget} />
+            <tr key={expense._id}>
+              <ExpenseItem
+                expense={expense}
+                showBudget={showBudget}
+                onDelete={onDelete} // Pass the onDelete prop here
+              />
             </tr>
           ))}
         </tbody>
@@ -25,4 +28,5 @@ const Table = ({ expenses, showBudget = true }) => {
     </div>
   );
 };
+
 export default Table;

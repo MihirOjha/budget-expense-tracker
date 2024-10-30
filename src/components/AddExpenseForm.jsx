@@ -1,7 +1,7 @@
-// src/components/AddExpenseForm.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { CurrencyDollarIcon } from '@heroicons/react/24/solid';
 
 const AddExpenseForm = ({ budgets, onExpenseCreated }) => {
   const [name, setName] = useState('');
@@ -13,8 +13,7 @@ const AddExpenseForm = ({ budgets, onExpenseCreated }) => {
 
   useEffect(() => {
     if (!isSubmitting) {
-      formRef.current.reset();
-      focusRef.current.focus();
+      focusRef.current.focus(); // Keep focus on the input after submission
     }
   }, [isSubmitting]);
 
@@ -26,13 +25,26 @@ const AddExpenseForm = ({ budgets, onExpenseCreated }) => {
 
     try {
       const response = await axios.post(apiUrl, { name, amount, budgetId });
-      toast.success('Expense created successfully!');
-      setName('');
-      setAmount('');
-      setBudgetId('');
-      onExpenseCreated(response.data); // Notify parent component
+
+      console.log('Response from API:', response.data); // Check the response
+
+      if (response.data && response.data.expense) {
+        // Call the handler with the new expense
+        onExpenseCreated(response.data.expense);
+        toast.success('Expense created successfully!');
+
+        // Reset the form fields
+        setName('');
+        setAmount('');
+        setBudgetId('');
+      } else {
+        throw new Error('No data returned from the server');
+      }
     } catch (error) {
-      toast.error('Failed to create expense: ' + error.response.data.message);
+      toast.error(
+        'Failed to create expense: ' +
+          (error.response?.data?.message || error.message),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -83,6 +95,7 @@ const AddExpenseForm = ({ budgets, onExpenseCreated }) => {
         </div>
         <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
           {isSubmitting ? 'Submitting...' : 'Add Expense'}
+          <CurrencyDollarIcon width={20} />
         </button>
       </form>
     </div>

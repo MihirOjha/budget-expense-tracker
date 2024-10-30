@@ -30,7 +30,6 @@ svg {
   --lh-1-4: 1.4;
 
   /* colors */
-  /* colors */
   --accent: 183 74% 44%;
   --bkg: 290 60% 98%;
   --text: 185 26% 9%;
@@ -154,9 +153,9 @@ p {
   border: 2px solid var(--backdrop);
   font-size: var(--fs-300);
   text-decoration: none;
-  display: -webkit-box;
+  display: inline-flex;
   display: -ms-flexbox;
-  display: flex;
+  display: inline-flex;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
@@ -406,7 +405,7 @@ select {
 /* dashboard */
 .dashboard {
   display: -ms-grid;
-  display: grid;
+  display: -ms-inline-grid;
   gap: var(--space-lg);
   place-items: start;
   width: 100%;
@@ -532,6 +531,64 @@ progress[value]::-moz-progress-bar {
   transition: all 500ms cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
+/* ConfirmModal.css */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure the modal is above other content */
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: left;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add some shadow for depth */
+  max-width: 500px; /* Limit the width of the modal */
+  width: 100%;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* Space above buttons */
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 10px; /* Space between buttons */
+  font-size: 16px;
+}
+
+.btn-confirm {
+  background-color: #ff4d4d; /* Red for delete */
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.btn-confirm:hover {
+  background-color: #ff1a1a; /* Darker red on hover */
+}
+
+.btn-cancel {
+  background-color: #4caf50; /* Green for cancel */
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
 /* error pages */
 .error {
   -ms-grid-row-align: center;
