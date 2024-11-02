@@ -20,6 +20,7 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.error(`CORS error: Origin ${origin} not allowed`);
         callback(new Error('Not allowed by CORS'));
       }
     },
@@ -28,7 +29,9 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
+
 
 // MongoDB Connection
 if (!process.env.MONGODB_URI) {

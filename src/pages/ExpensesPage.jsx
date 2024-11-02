@@ -1,4 +1,3 @@
-// src/pages/ExpensePage.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Table from '../components/Table';
@@ -15,7 +14,7 @@ const ExpensePage = () => {
     const fetchExpenses = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/expenses`,
+          `${import.meta.env.VITE_API_BASE_URL}/expenses`
         );
         setExpenses(response.data);
       } catch (error) {
@@ -37,10 +36,10 @@ const ExpensePage = () => {
   const confirmDelete = async () => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/expenses/${expenseToDelete}`,
+        `${import.meta.env.VITE_API_BASE_URL}/expenses/${expenseToDelete}`
       );
       setExpenses((prev) =>
-        prev.filter((expense) => expense._id !== expenseToDelete),
+        prev.filter((expense) => expense._id !== expenseToDelete)
       );
       toast.success('Expense deleted successfully!');
     } catch (error) {

@@ -13,17 +13,17 @@ const Budgets = () => {
     const fetchBudgetsAndExpenses = async () => {
       try {
         const budgetsResponse = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/budgets`,
+          `${import.meta.env.VITE_API_BASE_URL}/budgets`
         );
         const expensesResponse = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/expenses`,
+          `${import.meta.env.VITE_API_BASE_URL}/expenses`
         );
         setBudgets(budgetsResponse.data);
         setExpenses(expensesResponse.data);
       } catch (error) {
         console.error('Error fetching budgets and expenses:', error);
         toast.error(
-          'Error fetching budgets and expenses. Please try again later.',
+          'Error fetching budgets and expenses. Please try again later.'
         );
       } finally {
         setLoading(false);

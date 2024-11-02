@@ -1,4 +1,3 @@
-// src/pages/IncomePage.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import IncomeTable from '../components/IncomeTable';
@@ -16,7 +15,7 @@ const IncomePage = () => {
     const fetchIncome = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/income`,
+          `${import.meta.env.VITE_API_BASE_URL}/income`
         );
         setIncome(response.data);
       } catch (error) {
@@ -42,10 +41,10 @@ const IncomePage = () => {
   const confirmDelete = async () => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/income/${incomeToDelete}`,
+        `${import.meta.env.VITE_API_BASE_URL}/income/${incomeToDelete}`
       );
       setIncome((prev) =>
-        prev.filter((income) => income._id !== incomeToDelete),
+        prev.filter((income) => income._id !== incomeToDelete)
       );
       toast.success('Income deleted successfully!');
     } catch (error) {

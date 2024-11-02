@@ -22,10 +22,10 @@ const DashboardOverview = () => {
     const fetchSummaryAndBudgets = async () => {
       try {
         const summaryResponse = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/summary`,
+          `${import.meta.env.VITE_API_BASE_URL}/summary`
         );
         const budgetsResponse = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/budgets`,
+          `${import.meta.env.VITE_API_BASE_URL}/budgets`
         );
 
         setSummary(summaryResponse.data);
