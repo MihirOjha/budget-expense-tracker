@@ -1,3 +1,4 @@
+// src/components/Table.jsx
 import ExpenseItem from './ExpenseItem';
 
 const Table = ({ expenses, showBudget = true, onDelete }) => {
@@ -19,7 +20,7 @@ const Table = ({ expenses, showBudget = true, onDelete }) => {
               <ExpenseItem
                 expense={expense}
                 showBudget={showBudget}
-                onDelete={onDelete} // Pass the onDelete prop here
+                onDelete={onDelete} // Ensure onDelete is passed here
               />
             </tr>
           ))}

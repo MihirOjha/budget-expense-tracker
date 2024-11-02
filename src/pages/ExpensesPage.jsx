@@ -1,59 +1,77 @@
-// rrd imports
-import { useLoaderData } from 'react-router-dom';
-
-// library import
-import { toast } from 'react-toastify';
-
-// component imports
+// src/pages/ExpensePage.jsx
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Table from '../components/Table';
+import { toast } from 'react-toastify';
+import ConfirmModal from '../components/ConfirmModal';
 
-// helpers
-import { deleteItem, fetchExpenses } from '../helpers';
+const ExpensePage = () => {
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState(null);
 
-// loader
-export async function expensesLoader() {
-  const expenses = await fetchExpenses(); // Await the fetchExpenses function
-  return { expenses };
-}
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/expenses`,
+        );
+        setExpenses(response.data);
+      } catch (error) {
+        console.error('Error fetching expenses:', error);
+        toast.error('Error fetching expenses. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-// action
-export async function expensesAction({ request }) {
-  const data = await request.formData();
-  const { _action, ...values } = Object.fromEntries(data);
+    fetchExpenses();
+  }, []);
 
-  if (_action === 'deleteExpense') {
+  const handleDelete = (id) => {
+    setExpenseToDelete(id); // Set the expense to delete
+    setIsModalOpen(true); // Open the confirmation modal
+  };
+
+  const confirmDelete = async () => {
     try {
-      await deleteItem({
-        // Await the deleteItem function
-        key: 'expenses',
-        id: values.expenseId,
-      });
-      toast.success('Expense deleted!'); // Move toast success outside of the return statement
-    } catch (e) {
-      toast.error('There was a problem deleting your expense.'); // Show error toast
-      throw new Error('There was a problem deleting your expense.');
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/expenses/${expenseToDelete}`,
+      );
+      setExpenses((prev) =>
+        prev.filter((expense) => expense._id !== expenseToDelete),
+      );
+      toast.success('Expense deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+      toast.error('Error deleting expense. Please try again later.');
+    } finally {
+      setIsModalOpen(false); // Close the modal after confirmation
+      setExpenseToDelete(null); // Reset the expense to delete
     }
-  }
-}
+  };
 
-const ExpensesPage = () => {
-  const { expenses } = useLoaderData();
+  const cancelDelete = () => {
+    setIsModalOpen(false); // Just close the modal
+    setExpenseToDelete(null); // Reset the expense to delete
+  };
 
   return (
-    <div className="grid-lg">
+    <div className="expense-page">
       <h1>All Expenses</h1>
-      {expenses && expenses.length > 0 ? (
-        <div className="grid-md">
-          <h2>
-            Recent Expenses <small>({expenses.length} total)</small>
-          </h2>
-          <Table expenses={expenses} />
-        </div>
+      {loading ? (
+        <p>Loading...</p>
       ) : (
-        <p>No Expenses to show</p>
+        <Table expenses={expenses} onDelete={handleDelete} />
       )}
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </div>
   );
 };
 
-export default ExpensesPage;
+export default ExpensePage;

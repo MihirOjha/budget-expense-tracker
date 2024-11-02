@@ -55,13 +55,14 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
 });
 
-// Define Budget and Expense Schemas
+// Define Budget Schemas
 const budgetSchema = new mongoose.Schema({
   name: { type: String, required: true },
   amount: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
+// Define Expense Schemas
 const expenseSchema = new mongoose.Schema({
   name: { type: String, required: true },
   amount: { type: Number, required: true },
@@ -73,11 +74,20 @@ const expenseSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+// Define Income Schemas
+
+const incomeSchema = new mongoose.Schema({
+  source: { type: String, required: true },
+  amount: { type: Number, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
 // Models
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 const Budget = mongoose.models.Budget || mongoose.model('Budget', budgetSchema);
 const Expense =
   mongoose.models.Expense || mongoose.model('Expense', expenseSchema);
+const Income = mongoose.models.Income || mongoose.model('Income', incomeSchema);
 
 // Error Handling Function
 const handleError = (res, error) => {
@@ -237,15 +247,120 @@ app.delete('/api/expenses/:id', async (req, res) => {
     if (!deletedExpense) {
       return res.status(404).json({ message: 'Expense not found' });
     }
-    res
-      .status(200)
-      .json({
-        message: 'Expense deleted successfully',
-        expense: deletedExpense,
-      });
+    res.status(200).json({
+      message: 'Expense deleted successfully',
+      expense: deletedExpense,
+    });
   } catch (error) {
     console.error('Error deleting expense:', error);
     res.status(500).json({ message: 'Failed to delete expense' });
+  }
+});
+
+// Income Routes
+app.post('/api/income', async (req, res) => {
+  const { source, amount } = req.body;
+
+  try {
+    const income = new Income({ source, amount });
+    await income.save();
+    res.status(201).json({ message: 'Income added successfully', income });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.get('/api/income', async (req, res) => {
+  try {
+    const income = await Income.find();
+    res.json(income);
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.get('/api/income/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const income = await Income.findById(id);
+    if (!income) {
+      return res.status(404).json({ message: 'Income not found' });
+    }
+    res.status(200).json(income);
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+app.put(
+  '/api/income/:id',
+  [body('source').isString().notEmpty(), body('amount').isNumeric().notEmpty()],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const updatedIncome = await Income.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true },
+      );
+      if (!updatedIncome) {
+        return res.status(404).json({ message: 'Income not found' });
+      }
+      res.json(updatedIncome);
+    } catch (error) {
+      handleError(res, error);
+    }
+  },
+);
+
+app.delete('/api/income/:id', async (req, res) => {
+  try {
+    const deletedIncome = await Income.findByIdAndDelete(req.params.id);
+    if (!deletedIncome) {
+      return res.status(404).json({ message: 'Income not found' });
+    }
+    res.status(200).json({
+      message: 'Income deleted successfully',
+      income: deletedIncome,
+    });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+// Summary Route
+app.get('/api/summary', async (req, res) => {
+  try {
+    const totalBudgets = await Budget.countDocuments();
+
+    const totalExpensesResult = await Expense.aggregate([
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]);
+
+    const totalIncomeResult = await Income.aggregate([
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]);
+
+    const totalExpenses = totalExpensesResult[0]
+      ? totalExpensesResult[0].total
+      : 0;
+    const totalIncome = totalIncomeResult[0] ? totalIncomeResult[0].total : 0;
+    const remainingBalance = totalIncome - totalExpenses;
+
+    res.json({
+      totalBudgets,
+      totalExpenses,
+      totalIncome,
+      remainingBalance,
+      expensesDistribution: [], // Optional: Add logic to calculate this if needed
+      incomeDistribution: [], // Optional: Add logic to calculate this if needed
+    });
+  } catch (error) {
+    handleError(res, error);
   }
 });
 

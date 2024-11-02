@@ -4,7 +4,8 @@ import { Form, Link } from 'react-router-dom';
 import { BanknotesIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { formatCurrency } from '../helpers';
 
-const BudgetItem = ({ budget, expenses, showDelete = false }) => {
+const BudgetItem = ({ budget, expenses = [], showDelete = false }) => {
+  // Default value for expenses
   const { _id, name = 'Unnamed Budget', amount = 0, color = '#000' } = budget;
   const [spent, setSpent] = useState(0);
 
