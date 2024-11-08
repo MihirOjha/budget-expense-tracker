@@ -7,13 +7,13 @@ const AddIncomeForm = ({ onIncomeCreated }) => {
   const [source, setSource] = useState('');
   const [amount, setAmount] = useState('');
   const formRef = useRef(null);
-  const focusRef = useRef(null);
+  //const focusRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isSubmitting) {
       formRef.current.reset();
-      focusRef.current.focus();
+      //focusRef.current.focus();
     }
   }, [isSubmitting]);
 
@@ -58,7 +58,7 @@ const AddIncomeForm = ({ onIncomeCreated }) => {
             placeholder="e.g., Salary"
             value={source}
             onChange={(e) => setSource(e.target.value)}
-            ref={focusRef}
+            //ref={focusRef}
             required
           />
         </div>

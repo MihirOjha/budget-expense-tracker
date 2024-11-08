@@ -1,0 +1,92 @@
+/* table.css */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-lg);
+  table-layout: auto; /* Allow columns to resize according to content */
+}
+
+.table th,
+.table td {
+  padding: var(--space-sm);
+  text-align: left;
+  border-bottom: 1px solid hsl(var(--muted) / 0.2);
+  font-size: var(--fs-300);
+}
+
+.table th {
+  background-color: hsl(var(--bkg) / 0.8);
+  font-weight: bold;
+  color: hsl(var(--text));
+}
+
+.table tr:hover {
+  background-color: hsl(var(--muted) / 0.1);
+}
+
+.table .btn {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--fs-300);
+  background-color: var(--accent);
+  color: hsl(var(--bkg));
+  border: none;
+  border-radius: var(--round-sm);
+  cursor: pointer;
+  transition: background-color 300ms, transform 200ms ease-in-out;
+  text-align: center;
+}
+
+.table .btn:hover {
+  background-color: var(--accent-dark);
+  transform: translateY(-2px); /* Subtle hover effect */
+}
+
+.table .btn:active {
+  background-color: var(--accent-dark);
+  transform: translateY(1px); /* Press effect */
+}
+
+.table .btn:disabled {
+  background-color: hsl(var(--muted));
+  cursor: not-allowed;
+}
+
+.table td .btn,
+.table th .btn {
+  width: 100%;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    padding: var(--space-xs);
+    font-size: var(--fs-200);
+  }
+
+  .table {
+    overflow-x: auto; /* Ensure horizontal scrolling on small screens */
+    display: block;
+    width: 100%;
+  }
+
+  .table th,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    display: block;
+    margin-bottom: var(--space-sm);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    border-radius: var(--round-sm);
+  }
+
+  .table .btn {
+    width: auto;
+    margin: var(--space-xs) auto;
+  }
+}

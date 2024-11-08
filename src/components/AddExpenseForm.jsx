@@ -8,12 +8,12 @@ const AddExpenseForm = ({ budgets, onExpenseCreated }) => {
   const [amount, setAmount] = useState('');
   const [budgetId, setBudgetId] = useState('');
   const formRef = useRef(null);
-  const focusRef = useRef(null);
+  //const focusRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isSubmitting) {
-      focusRef.current.focus(); // Keep focus on the input after submission
+      //focusRef.current.focus(); // Keep focus on the input after submission
     }
   }, [isSubmitting]);
 
@@ -62,7 +62,7 @@ const AddExpenseForm = ({ budgets, onExpenseCreated }) => {
             placeholder="e.g., Rent"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            ref={focusRef}
+            //ref={focusRef}
             required
           />
         </div>

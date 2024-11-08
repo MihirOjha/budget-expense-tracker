@@ -1,10 +1,10 @@
-// src/components/Table.jsx
+import React from 'react';
 import ExpenseItem from './ExpenseItem';
 
 const Table = ({ expenses, showBudget = true, onDelete }) => {
   return (
     <div className="table">
-      <table>
+      <table className="expense-table">
         <thead>
           <tr>
             <th>Name</th>
@@ -16,13 +16,12 @@ const Table = ({ expenses, showBudget = true, onDelete }) => {
         </thead>
         <tbody>
           {expenses.map((expense) => (
-            <tr key={expense._id}>
-              <ExpenseItem
-                expense={expense}
-                showBudget={showBudget}
-                onDelete={onDelete} // Ensure onDelete is passed here
-              />
-            </tr>
+            <ExpenseItem
+              key={expense._id}
+              expense={expense}
+              showBudget={showBudget}
+              onDelete={onDelete}
+            />
           ))}
         </tbody>
       </table>

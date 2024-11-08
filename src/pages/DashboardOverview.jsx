@@ -22,10 +22,10 @@ const DashboardOverview = () => {
     const fetchSummaryAndBudgets = async () => {
       try {
         const summaryResponse = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/summary`
+          `${import.meta.env.VITE_API_BASE_URL}/summary`,
         );
         const budgetsResponse = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/budgets`
+          `${import.meta.env.VITE_API_BASE_URL}/budgets`,
         );
 
         setSummary(summaryResponse.data);
@@ -49,11 +49,14 @@ const DashboardOverview = () => {
     }));
   };
 
+  if (loading) {
+    return <div className="loading-indicator">Loading...</div>; // Placeholder for loading state
+  }
+
   return (
     <div className="dashboard-overview">
       <h1>Dashboard</h1>
-      <div className="summary-cards">
-        <SummaryCard title="Total Budgets" value={summary.totalBudgets} />
+      <div className="grid-sm">
         <SummaryCard title="Total Expenses" value={summary.totalExpenses} />
         <SummaryCard title="Total Income" value={summary.totalIncome} />
         <SummaryCard
@@ -61,17 +64,14 @@ const DashboardOverview = () => {
           value={summary.remainingBalance}
         />
       </div>
-      <div className="charts">
+      <div className="grid-sm">
         <Chart type="pie" data={summary.expensesDistribution} />
         <Chart type="bar" data={summary.incomeDistribution} />
       </div>
-      <div className="expense-form">
-        <h2>Add New Expense</h2>
-        <AddExpenseForm
-          budgets={budgets}
-          onExpenseCreated={handleExpenseCreated}
-        />
-      </div>
+      <AddExpenseForm
+        budgets={budgets}
+        onExpenseCreated={handleExpenseCreated}
+      />
     </div>
   );
 };

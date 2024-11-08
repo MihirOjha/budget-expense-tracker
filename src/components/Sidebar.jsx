@@ -1,15 +1,17 @@
-// src/components/Sidebar.jsx
 import React from 'react';
-import { Link } from 'react-router-dom';
-//import './Sidebar.css'; // Add styles here
+import NavLinks from './Navlinks'; // Make sure to use the correct import
 
-const Sidebar = () => (
-  <div className="sidebar">
-    <Link to="/">Dashboard</Link>
-    <Link to="/budgets">Budgets</Link>
-    <Link to="/expenses">Expenses</Link>
-    <Link to="/income">Income</Link>
-  </div>
-);
+const Sidebar = ({ isCollapsed, sidebarRef }) => {
+  return (
+    <div
+      ref={sidebarRef}
+      className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}
+    >
+      <nav>
+        <NavLinks />
+      </nav>
+    </div>
+  );
+};
 
 export default Sidebar;

@@ -14,7 +14,7 @@ const ExpensePage = () => {
     const fetchExpenses = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/expenses`
+          `${import.meta.env.VITE_API_BASE_URL}/expenses`,
         );
         setExpenses(response.data);
       } catch (error) {
@@ -29,35 +29,35 @@ const ExpensePage = () => {
   }, []);
 
   const handleDelete = (id) => {
-    setExpenseToDelete(id); // Set the expense to delete
-    setIsModalOpen(true); // Open the confirmation modal
+    setExpenseToDelete(id);
+    setIsModalOpen(true);
   };
 
   const confirmDelete = async () => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/expenses/${expenseToDelete}`
+        `${import.meta.env.VITE_API_BASE_URL}/expenses/${expenseToDelete}`,
       );
       setExpenses((prev) =>
-        prev.filter((expense) => expense._id !== expenseToDelete)
+        prev.filter((expense) => expense._id !== expenseToDelete),
       );
       toast.success('Expense deleted successfully!');
     } catch (error) {
       console.error('Error deleting expense:', error);
       toast.error('Error deleting expense. Please try again later.');
     } finally {
-      setIsModalOpen(false); // Close the modal after confirmation
-      setExpenseToDelete(null); // Reset the expense to delete
+      setIsModalOpen(false);
+      setExpenseToDelete(null);
     }
   };
 
   const cancelDelete = () => {
-    setIsModalOpen(false); // Just close the modal
-    setExpenseToDelete(null); // Reset the expense to delete
+    setIsModalOpen(false);
+    setExpenseToDelete(null);
   };
 
   return (
-    <div className="expense-page">
+    <div className="grid-lg">
       <h1>All Expenses</h1>
       {loading ? (
         <p>Loading...</p>

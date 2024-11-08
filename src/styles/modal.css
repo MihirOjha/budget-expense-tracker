@@ -1,0 +1,70 @@
+/* modal.css */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0; /* Initially hidden */
+  visibility: hidden; /* Prevent clicks when hidden */
+  transition: opacity 300ms ease, visibility 300ms ease;
+}
+
+.modal.show {
+  opacity: 1;
+  visibility: visible; /* Show the modal */
+}
+
+.modal-content {
+  background: hsl(var(--bkg));
+  padding: var(--space-lg);
+  border-radius: var(--round-lg);
+  box-shadow: 0 0 1rem hsl(var(--muted) / 0.5);
+  width: 90%;
+  max-width: 400px;
+  transition: transform 300ms ease;
+  transform: translateY(-10px); /* Start slightly above */
+}
+
+.modal.show .modal-content {
+  transform: translateY(0); /* Smooth slide-in effect */
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-md);
+}
+
+.modal-buttons .btn {
+  flex: 1;
+  margin: 0 var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--fs-300);
+  transition: background-color 300ms ease;
+}
+
+.modal-buttons .btn:hover {
+  background-color: hsl(var(--muted) / 0.2);
+}
+
+.modal-buttons .btn:active {
+  background-color: hsl(var(--muted) / 0.3);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .modal-content {
+    max-width: 90%;
+    padding: var(--space-md);
+  }
+
+  .modal-buttons .btn {
+    font-size: var(--fs-200);
+  }
+}

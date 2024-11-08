@@ -1,0 +1,89 @@
+/* src/pages/DashboardOverview.css */
+
+/* Reset and base styles */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: hsl(var(--bkg));
+  color: hsl(var(--text));
+  transition: background-color 300ms ease;
+}
+
+/* Main content styling */
+.dashboard-container {
+  display: flex;
+  flex-wrap: wrap; /* Ensure flexibility on small screens */
+  gap: var(--space-lg);
+  padding: var(--space-md);
+  box-sizing: border-box;
+}
+
+.main-content {
+  margin-left: 220px; /* Width of the sidebar + padding */
+  padding: var(--space-lg);
+  width: calc(100% - 220px); /* Adjust main content width */
+  background-color: hsl(var(--bkg));
+}
+
+.main-content h1 {
+  font-size: var(--fs-500);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+}
+
+/* Styling for summary cards and charts */
+.summary-cards,
+.charts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.chart,
+.expense-form {
+  background: hsl(var(--bkg));
+  padding: var(--space-lg);
+  border-radius: var(--round-lg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1; /* Allow resizing */
+  min-width: 300px;
+  transition: transform 300ms ease, box-shadow 300ms ease;
+}
+
+/* Hover effect for charts and form elements */
+.chart:hover,
+.expense-form:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .charts,
+  .summary-cards {
+    flex-direction: column;
+  }
+
+  .sidebar.collapsed + .dashboard-content {
+    margin-left: 60px;
+  }
+}

@@ -1,0 +1,72 @@
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--fs-300);
+  font-weight: bold;
+  color: hsl(var(--bkg));
+  background-color: hsl(var(--accent));
+  border: none;
+  border-radius: var(--round-sm);
+  cursor: pointer;
+  transition: background-color 300ms, transform 200ms;
+  text-transform: uppercase; /* Makes button text all uppercase */
+}
+
+.btn:hover {
+  background-color: hsl(var(--accent-dark));
+  transform: scale(1.05); /* Slight scale effect for hover */
+}
+
+.btn:disabled {
+  background-color: hsl(var(--muted));
+  cursor: not-allowed;
+  transform: none; /* Remove hover effect on disabled buttons */
+}
+
+.btn--dark {
+  background-color: hsl(var(--text));
+  color: hsl(var(--bkg));
+}
+
+.btn--dark:hover {
+  background-color: hsl(var(--text-dark)); /* Slightly darker hover effect */
+}
+
+.btn--outline {
+  background-color: transparent;
+  color: hsl(var(--accent));
+  border: 2px solid hsl(var(--accent));
+  padding: var(--space-xs) var(--space-lg);
+}
+
+.btn--outline:hover {
+  --backdrop: hsl(var(--warning) / 0.1);
+  border: 2px solid hsl(var(--warning));
+  /* --color: hsl(var(--warning)); */
+}
+
+.btn--warning {
+  background-color: hsl(var(--warning));
+  /* color: hsl(var(--bkg)); */
+}
+
+.btn--warning:hover {
+  background-color: hsl(var(--warning-dark));
+}
+
+.btn--icon {
+  padding: var(--space-xs);
+  border-radius: var(--round-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn--icon svg {
+  margin-right: var(--space-xs);
+}
+
+/* Add additional variations here */

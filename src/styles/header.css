@@ -1,0 +1,29 @@
+/* header.css */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: hsl(var(--bkg) / 0.9);
+  padding: var(--space-md);
+  border-bottom: 1px solid hsl(var(--muted) / 0.2);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 101;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: var(--fs-500);
+  color: hsl(var(--text));
+}
+
+.header .toggle-button {
+  background: none;
+  border: none;
+  color: hsl(var(--text));
+  font-size: var(--fs-400);
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+}

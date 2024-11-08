@@ -15,7 +15,7 @@ const IncomePage = () => {
     const fetchIncome = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/income`
+          `${import.meta.env.VITE_API_BASE_URL}/income`,
         );
         setIncome(response.data);
       } catch (error) {
@@ -41,10 +41,10 @@ const IncomePage = () => {
   const confirmDelete = async () => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/income/${incomeToDelete}`
+        `${import.meta.env.VITE_API_BASE_URL}/income/${incomeToDelete}`,
       );
       setIncome((prev) =>
-        prev.filter((income) => income._id !== incomeToDelete)
+        prev.filter((income) => income._id !== incomeToDelete),
       );
       toast.success('Income deleted successfully!');
     } catch (error) {
@@ -62,7 +62,7 @@ const IncomePage = () => {
   };
 
   return (
-    <div className="income-page">
+    <div className="grid-lg">
       <h1>All Income</h1>
       <AddIncomeForm onIncomeCreated={handleAddIncome} />
       {loading ? (
